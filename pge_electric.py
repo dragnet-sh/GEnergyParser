@@ -57,9 +57,9 @@ def main():
             if demand_charge[i].value:
                 current_demand_charge = demand_charge[i].value
 
-            print '{} | {}  | {} | {} | {} | {}'.\
-                format(current_rate, current_season, time_of_use_dc[i].value, current_demand_charge,
-                       time_of_use_ec[i].value, energy_charge[i].value)
+            print '{}|{}|{}|{}|{}|{}'.\
+                format(current_rate, current_season.strip().lower(), time_of_use_dc[i].value.strip().lower(), current_demand_charge,
+                       time_of_use_ec[i].value.strip().lower(), energy_charge[i].value)
 
 
 if __name__ == '__main__':
