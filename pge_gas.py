@@ -1,8 +1,10 @@
 import xlrd
 import re
+import csv
 
 DATA_PATH = '../../data/pge_gas_small.xlsx'
 SHEET = 'G-NR1 (2016-Present)'
+OUTPUT_FILE = '../resource/pge_gas.csv'
 
 CHARGE_INDEX = [i for i in range(2, 6)]
 SUMMER = 12
@@ -18,6 +20,7 @@ def get_xls_object(file_path, sheet):
 def main():
     xl_sheet = get_xls_object(DATA_PATH, SHEET)
     total_rows = xl_sheet.nrows
+    outgoing = []
 
     re_date = '^\d+\.'
     for i in range(0, total_rows):
@@ -28,9 +31,21 @@ def main():
             p_date = xlrd.xldate_as_datetime(cell_value, 0)
             p_rate = []
             for index in CHARGE_INDEX:
-                p_rate.append(xl_sheet.cell_value(i, index))
-            print '{}{}|{}'.format(p_date.strftime('%y'), p_date.strftime('%m'), p_rate)
+                p_rate.append(str(xl_sheet.cell_value(i, index)))
 
+            tmp = list()
+            tmp.append(p_date.strftime('%y'))
+            tmp.append(p_date.strftime('%m'))
+            tmp.extend(p_rate)
+
+            outgoing.append(tmp)
+
+    print outgoing
+
+    with open(OUTPUT_FILE, 'w') as file_obj:
+        writer = csv.writer(file_obj, delimiter=',', quoting=csv.QUOTE_MINIMAL)
+        for line in outgoing:
+            writer.writerow(line)
 
 if __name__ == '__main__':
     main()

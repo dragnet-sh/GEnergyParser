@@ -1,9 +1,10 @@
 import xlrd
 import re
+import csv
 
 DATA_PATH = '../../data/pge_electric.xlsx'
 SHEET = 'Comm\'l_170301-Present'
-
+OUTPUT_FILE = '../resource/pge_electric.csv'
 
 '''Returns the xls sheet object'''
 def get_xls_object(file_path, sheet):
@@ -42,6 +43,7 @@ def main():
     current_rate = None
     current_season = None
     current_demand_charge = None
+    outgoing = []
 
     for i in range(0, total_rows):
         cell_value = xl_sheet.cell(i, 0).value
@@ -57,9 +59,18 @@ def main():
             if demand_charge[i].value:
                 current_demand_charge = demand_charge[i].value
 
-            print '{}|{}|{}|{}|{}|{}'.\
-                format(current_rate, current_season.strip().lower(), time_of_use_dc[i].value.strip().lower(), current_demand_charge,
-                       time_of_use_ec[i].value.strip().lower(), energy_charge[i].value)
+            tmp = '{}|{}|{}|{}|{}|{}'.\
+                format(current_rate, current_season.strip().lower(), time_of_use_dc[i].value.strip().lower(),
+                       current_demand_charge, time_of_use_ec[i].value.strip().lower(), energy_charge[i].value)
+
+            outgoing.append(tmp.split('|'))
+
+    print outgoing
+
+    with open(OUTPUT_FILE, 'w') as file_obj:
+        writer = csv.writer(file_obj, delimiter=',', quoting=csv.QUOTE_MINIMAL)
+        for line in outgoing:
+            writer.writerow(line)
 
 
 if __name__ == '__main__':
