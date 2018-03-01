@@ -6,11 +6,12 @@ DATA_PATH = '../../data/pge_gas_small.xlsx'
 SHEET = 'G-NR1 (2016-Present)'
 OUTPUT_FILE = '../resource/pge_gas.csv'
 
-CHARGE_INDEX = [i for i in range(2, 6)]
+CHARGE_INDEX = [i for i in range(2, 7)]
 SUMMER = 12
 WINTER = 14
+SURCHARGE = 16
 
-CHARGE_INDEX.extend([SUMMER, WINTER])
+CHARGE_INDEX.extend([SUMMER, WINTER, SURCHARGE])
 
 '''Returns the xls sheet object'''
 def get_xls_object(file_path, sheet):
