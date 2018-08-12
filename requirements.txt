@@ -1,0 +1,4 @@
+mysql-connector==2.1.6
+parse-rest==0.2.20170114
+six==1.11.0
+xlrd==1.1.0
