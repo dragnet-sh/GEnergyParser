@@ -6,7 +6,7 @@ import uuid
 def parse_csv(file_path):
     fh = open(file_path, 'rt')
     form_mapper = dict()
-    form_mapper['gemini-form'] = []
+    form_mapper['geminiForm'] = []
 
     counter_section = 0
     counter_element = 0
@@ -31,7 +31,7 @@ def parse_csv(file_path):
                 section_block['index'] = counter_section    
                 section_block['elements'] = []
                 
-                form_mapper.get('gemini-form').append(section_block)
+                form_mapper.get('geminiForm').append(section_block)
 
             element = row[1]
             element_type = row[2]
@@ -47,8 +47,8 @@ def parse_csv(file_path):
             element_block['id'] = str(counter_section) + str(counter_element)
             element_block['param'] = element
             element_block['index'] = int(str(counter_section) + str(counter_element))
-            element_block['data-type'] = str.lower(element_type)
-            element_block['default-values'] = element_options
+            element_block['dataType'] = str.lower(element_type)
+            element_block['defaultValues'] = element_options
             element_block['validation'] = element_validation
 
             section_block.get('elements').append(element_block)
@@ -59,8 +59,8 @@ def parse_csv(file_path):
     return form_mapper
 
 
-input_file = './form/combination_oven.csv'
-output_file = './output/combination_oven.json'
+input_file = '../data/form/combination_oven.csv'
+output_file = '../data/form/output/combination_oven.json'
 data = parse_csv(input_file)
 
 print(json.dumps(data))
