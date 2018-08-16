@@ -1,11 +1,16 @@
 import os
 
-instance = 'LOCAL'
+instance = 'PROD'
 
 if instance == 'LOCAL':
     os.environ["PARSE_API_ROOT"] = "http://localhost:1337/parse"
     APPLICATION_ID = 'NLI214vDqkoFTJSTtIE2xLqMme6Evd0kA1BbJ20S'
     MASTER_KEY = 'lgEhciURXhAjzITTgLUlXAEdiMJyIF4ZBXdwfpUr'
+
+if instance == 'PROD':
+    os.environ["PARSE_API_ROOT"] = "http://ec2-18-220-200-115.us-east-2.compute.amazonaws.com:80/parse/"
+    APPLICATION_ID = '47f916f7005d19ddd78a6be6b4bdba3ca49615a0'
+    MASTER_KEY = 'NLI214vDqkoFTJSTtIE2xLqMme6Evd0kA1BbJ20S'
 
 from parse_rest.connection import register
 from parse_rest.datatypes import Object
@@ -29,12 +34,12 @@ import re
 
 import mysql.connector as mysql
 from mysql.connector import Error
-cnx = mysql.connect(user='root', password='password', host='127.0.0.1', database='gemini')
+cnx = mysql.connect(user='root', password='', host='127.0.0.1', database='gemini_v1')
 
 from os import listdir
 from os.path import isfile, join
 
-DATA_PATH = '../../data/PlugLoad-Equipment/'
+DATA_PATH = '../data/PlugLoad-Equipment/'
 
 op_hdr_lines = []
 hdr_hash_map = dict()
@@ -132,12 +137,11 @@ def main():
         ParseBatcher().batch_save(pl_data_collection)
 
 def list_file_path():
-    data_files = [files for files in listdir(DATA_PATH) if isfile(join(DATA_PATH, files))]
-    # data_files = ['Solid_Door_Freezers_retrofits.xlsx']
+    # data_files = [files for files in listdir(DATA_PATH) if isfile(join(DATA_PATH, files))]
+    data_files = ['combination_ovens_retrofits.xlsx']
 
     '''Note: Removing this item as it does not comply with Company - Model Index'''
     try:
-        data_files.remove('televisions_retrofit_2017.xlsx')
         data_files.remove('.DS_Store')
     except:
         print('unable to clean data files')
