@@ -23,6 +23,10 @@ class PlugLoad(Object):
     pass
 
 
+class HVAC(Object):
+    pass
+
+
 ## 1. Read the CSV file
 ## 2. Save the Header to a list
 ## 3. Iterate through each of the data lines
@@ -39,7 +43,7 @@ cnx = mysql.connect(user='root', password='', host='127.0.0.1', database='gemini
 from os import listdir
 from os.path import isfile, join
 
-DATA_PATH = '../data/PlugLoad-Equipment/'
+DATA_PATH = '../data/hvac/'
 
 op_hdr_lines = []
 hdr_hash_map = dict()
@@ -47,7 +51,7 @@ hdr_metadata = list()
 
 re_hdr_identifier = re.compile('company', re.IGNORECASE)
 hdr_column_index = 1
-tbl_column_index = 1
+tbl_column_index = 0  # *** Set this to whatever value the Table Column stars at ***
 
 
 def main():
@@ -71,14 +75,16 @@ def main():
         hdr_row_index = None
 
         '''Identify the Header Start Row Index'''
-        for i in range(0, total_rows):
-            if re.search(re_hdr_identifier, sheet.cell(i, hdr_column_index).value):
-                hdr_row_index = i
-                break
+        # for i in range(0, total_rows):
+        #     if re.search(re_hdr_identifier, sheet.cell(i, hdr_column_index).value):
+        #         hdr_row_index = i
+        #         break
+
+        hdr_row_index = 0  # *** The regular expression search does this or set it manually ***
 
         '''Sanitize the Header Row - Create the Hash Map for each of the Header Items'''
         hdr_row = sheet.row(hdr_row_index)
-        hdr_row.pop(0)  # This is because the first column is empty ****
+        # hdr_row.pop(0)  # This is because the first column is empty **** IMP. CONFIGURE THIS !! ****
         hdr_row_sanitized = [sanitize(item) for item in hdr_row]
         hdr_hash_map.update({data_file: [item for item in hdr_row_sanitized]})
 
@@ -96,8 +102,9 @@ def main():
                 cnx.close
 
         '''Create the Data Row'''
-        pl_data_collection = []
-        for i in range(hdr_row_index + 1, total_rows):
+        hdr_offset = 1  # Set to 1 if the first line is a header
+        data_collection = []
+        for i in range(hdr_row_index + hdr_offset, total_rows):
             data_row = sheet.row_values(i, start_colx=tbl_column_index, end_colx=len(hdr_row_sanitized) + 1)
 
             ''' ***** SQL DATA INSERTION ***** '''
@@ -115,30 +122,34 @@ def main():
             ''' ***** PARSE UPLOAD ***** '''
 
             ## 1. Initializing the Plugload Object
-            plugload = PlugLoad(
+            # plugload = PlugLoad(
+            #     type=data_file
+            # )
+            # plugload.data = dict()
+
+            to_upload = HVAC(
                 type=data_file
             )
-            plugload.data = dict()
+            to_upload.data = dict()
 
             for index, data in enumerate(data_row):
                 field_id = hdr_hash_map.get(data_file)[index]
-                plugload.data.update({
+                to_upload.data.update({
                     field_id: data
                 })
 
             ## 3. Aggregating the Data to do a Batch Save
-            pl_data_collection.append(plugload)
+            data_collection.append(to_upload)
 
         cnx.commit()
         cursor.close()
 
-
         ## 4. Batch Upload - Parse Server
-        ParseBatcher().batch_save(pl_data_collection)
+        ParseBatcher().batch_save(data_collection)
 
 def list_file_path():
     # data_files = [files for files in listdir(DATA_PATH) if isfile(join(DATA_PATH, files))]
-    data_files = ['combination_ovens_retrofits.xlsx']
+    data_files = ['cooling_hours.xlsx', 'hvac_eer.xlsx', 'hvac_efficiency.xlsx']
 
     '''Note: Removing this item as it does not comply with Company - Model Index'''
     try:
