@@ -2,9 +2,9 @@ import xlrd
 import re
 import csv
 
-DATA_PATH = '../../data/pge_electric.xlsx'
-SHEET = 'Comm\'l_170301-Present'
-OUTPUT_FILE = '../resource/pge_electric.csv'
+DATA_PATH = '../data/utility/pge_electric.xlsx'
+SHEET = 'Comm\'l_180301-Present'
+OUTPUT_FILE = '../data/utility/output/pge_electric.csv'
 
 '''Returns the xls sheet object'''
 def get_xls_object(file_path, sheet):
@@ -42,7 +42,7 @@ def main():
 
     current_rate = None
     current_season = None
-    current_demand_charge = None
+    current_demand_charge = 0
     outgoing = []
 
     for i in range(0, total_rows):
@@ -56,12 +56,16 @@ def main():
             if season[i].value:
                 current_season = season[i].value
 
-            if demand_charge[i].value:
+            if type(demand_charge[i].value) is float:
                 current_demand_charge = demand_charge[i].value
 
-            tmp = '{}|{}|{}|{}|{}|{}'.\
+            clean_tou_period = re.sub("\s+", "-", time_of_use_ec[i].value.strip().lower())
+            if clean_tou_period == "":
+                clean_tou_period = "none"
+
+            tmp = '{}|{}|{}|{}|{}|{}|{}'.\
                 format(current_rate, current_season.strip().lower(), time_of_use_dc[i].value.strip().lower(),
-                       current_demand_charge, time_of_use_ec[i].value.strip().lower(), energy_charge[i].value)
+                       current_demand_charge, clean_tou_period, energy_charge[i].value, 0)
 
             outgoing.append(tmp.split('|'))
 
