@@ -27,6 +27,10 @@ class HVAC(Object):
     pass
 
 
+class Motors(Object):
+    pass
+
+
 ## 1. Read the CSV file
 ## 2. Save the Header to a list
 ## 3. Iterate through each of the data lines
@@ -43,15 +47,15 @@ cnx = mysql.connect(user='root', password='', host='127.0.0.1', database='gemini
 from os import listdir
 from os.path import isfile, join
 
-DATA_PATH = '../data/hvac/'
+DATA_PATH = '../data/motors/'
 
 op_hdr_lines = []
 hdr_hash_map = dict()
 hdr_metadata = list()
 
 re_hdr_identifier = re.compile('company', re.IGNORECASE)
-hdr_column_index = 1
-tbl_column_index = 0  # *** Set this to whatever value the Table Column stars at ***
+hdr_column_index = 0
+tbl_column_index = 0  # *** Set this to whatever value the Table Column starts at ***
 
 
 def main():
@@ -127,7 +131,7 @@ def main():
             # )
             # plugload.data = dict()
 
-            to_upload = HVAC(
+            to_upload = Motors(
                 type=data_file
             )
             to_upload.data = dict()
@@ -149,7 +153,7 @@ def main():
 
 def list_file_path():
     # data_files = [files for files in listdir(DATA_PATH) if isfile(join(DATA_PATH, files))]
-    data_files = ['cooling_hours.xlsx', 'hvac_eer.xlsx', 'hvac_efficiency.xlsx']
+    data_files = ['motor_efficiency.xlsx']
 
     '''Note: Removing this item as it does not comply with Company - Model Index'''
     try:
