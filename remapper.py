@@ -1,3 +1,7 @@
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 import json
 import xlrd
 
@@ -36,7 +40,8 @@ def parse(data_row):
         element = row[1]
         element_type = row[2]
         element_options = ''
-        element_validation = ''
+        element_validation = str(row[4]).lower()
+        element_hint = row[5]
 
         def map_option_id(option_line):
             options = option_line.split(',')
@@ -55,8 +60,12 @@ def parse(data_row):
         element_block['dataType'] = str.lower(element_type)
         element_block['defaultValues'] = element_options
         element_block['validation'] = element_validation
+        element_block['hint'] = element_hint
 
-        section_block.get('elements').append(element_block)
+        try:
+            section_block.get('elements').append(element_block)
+        except Exception, err:
+            print err
 
     return form_mapper
 
