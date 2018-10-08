@@ -47,15 +47,15 @@ cnx = mysql.connect(user='root', password='', host='127.0.0.1', database='gemini
 from os import listdir
 from os.path import isfile, join
 
-DATA_PATH = '../data/motors/'
+DATA_PATH = '../data/plugloads/'
 
 op_hdr_lines = []
 hdr_hash_map = dict()
 hdr_metadata = list()
 
 re_hdr_identifier = re.compile('company', re.IGNORECASE)
-hdr_column_index = 0
-tbl_column_index = 0  # *** Set this to whatever value the Table Column starts at ***
+hdr_column_index = 1
+tbl_column_index = 1  # *** Set this to whatever value the Table Column starts at ***
 
 
 def main():
@@ -63,7 +63,7 @@ def main():
 
     '''Loop through each of the PlugLoad Equipment Files'''
     for data_file in data_files:
-        # print data_file
+        print data_file
         file_path = join(DATA_PATH, data_file)
 
         try:
@@ -79,16 +79,16 @@ def main():
         hdr_row_index = None
 
         '''Identify the Header Start Row Index'''
-        # for i in range(0, total_rows):
-        #     if re.search(re_hdr_identifier, sheet.cell(i, hdr_column_index).value):
-        #         hdr_row_index = i
-        #         break
+        for i in range(0, total_rows):
+            if re.search(re_hdr_identifier, sheet.cell(i, hdr_column_index).value):
+                hdr_row_index = i
+                break
 
-        hdr_row_index = 0  # *** The regular expression search does this or set it manually ***
+        # hdr_row_index = 0  # *** The regular expression search does this or set it manually ***
 
         '''Sanitize the Header Row - Create the Hash Map for each of the Header Items'''
         hdr_row = sheet.row(hdr_row_index)
-        # hdr_row.pop(0)  # This is because the first column is empty **** IMP. CONFIGURE THIS !! ****
+        hdr_row.pop(0)  # This is because the first column is empty **** IMP. CONFIGURE THIS !! ****
         hdr_row_sanitized = [sanitize(item) for item in hdr_row]
         hdr_hash_map.update({data_file: [item for item in hdr_row_sanitized]})
 
@@ -125,13 +125,8 @@ def main():
 
             ''' ***** PARSE UPLOAD ***** '''
 
-            ## 1. Initializing the Plugload Object
-            # plugload = PlugLoad(
-            #     type=data_file
-            # )
-            # plugload.data = dict()
-
-            to_upload = Motors(
+            ## 1. Initializing the Equipment Object
+            to_upload = PlugLoad(
                 type=data_file
             )
             to_upload.data = dict()
@@ -152,8 +147,8 @@ def main():
         ParseBatcher().batch_save(data_collection)
 
 def list_file_path():
-    # data_files = [files for files in listdir(DATA_PATH) if isfile(join(DATA_PATH, files))]
-    data_files = ['motor_efficiency.xlsx']
+    data_files = [files for files in listdir(DATA_PATH) if isfile(join(DATA_PATH, files))]
+    # data_files = ['motor_efficiency.xlsx']
 
     '''Note: Removing this item as it does not comply with Company - Model Index'''
     try:
